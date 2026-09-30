@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -N maker_filtering
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o maker_filter.stdout
+#PBS -e maker_filter.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+perl "/nlustre/users/jsingh/ficus_benjamina/quality_filter" -a 0.5 "/nlustre/users/jsingh/ficus_benjamina/benjamina_round2_annotation.maker.output/benjamina_round2_annotation.all.maker.gff" > /nlustre/users/jsingh/ficus_benjamina/benjamina_filtered_v2.gff3
+

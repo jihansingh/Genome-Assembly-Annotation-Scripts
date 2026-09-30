@@ -1,0 +1,24 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=01:00:00
+#PBS -q short
+#PBS -o diamond.stdout
+#PBS -e diamond.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load diamond-2.0.11
+
+mkdir -p /nlustre/users/jsingh/ficus_benjamina/doubletrouble/
+
+diamond blastp \
+  -q /nlustre/users/jsingh/ficus_benjamina/benjamina_proteins_processed.fasta \
+  -d /nlustre/users/jsingh/ficus_benjamina/benjamina_proteins_processed.fasta \
+  -o /nlustre/users/jsingh/ficus_benjamina/doubletrouble/Fbenjamina_vs_Fbenjamina.tsv \
+  -f 6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore \
+  -k 5 \
+  --threads 24
+

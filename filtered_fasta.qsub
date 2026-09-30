@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -N filtered_fasta_craterostoma
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o filtered_fasta.stdout
+#PBS -e filtered_fasta.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load gffread
+
+gffread /nlustre/users/jsingh/ficus_benjamina/benjamina_filtered_v2.gff3 -g /nlustre/users/jsingh/ficus_benjamina/benjamina_assembly.fasta -y /nlustre/users/jsingh/ficus_benjamina/benjamina_filtered_v2.proteins.fasta

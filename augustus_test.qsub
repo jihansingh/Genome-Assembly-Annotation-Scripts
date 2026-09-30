@@ -1,0 +1,36 @@
+#!/bin/bash
+#PBS -N augustus_train
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o augustus_test.stdout
+#PBS -e augustus_test.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+# =============================
+# CHANGE TO WORKING DIRECTORY
+# =============================
+cd $PBS_O_WORKDIR
+echo "Starting AUGUSTUS test"
+date
+
+# =============================
+# SETTINGS
+# =============================
+SPECIES=ficus_craterostoma
+GFF="/nlustre/users/jsingh/ficus_craterostoma/hifiasm_annotation.maker.output/hifiasm_annotation.all.maker.gff"
+GENOME="/nlustre/users/jsingh/ficus_craterostoma/racon_hifiasm/racon_polish3.fasta"
+THREADS=24
+
+# =============================
+# LOAD MODULES
+# =============================
+module load augustus-3.5.0
+
+augustus --species=ficus_craterostoma \
+  /nlustre/users/jsingh/ficus_craterostoma/ficus_craterostoma.gb.test \
+  > ficus_craterostoma_test.out 2>&1
+
+grep -A5 "nucleotide level\|exon level\|gene level" ficus_craterostoma_test.out

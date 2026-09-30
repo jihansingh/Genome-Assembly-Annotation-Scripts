@@ -1,0 +1,84 @@
+#!/bin/bash
+#PBS -N benjamina_snap_training
+#PBS -l nodes=1:ppn=28
+#PBS -l walltime=720:00:00
+#PBS -q long
+#PBS -o snap_train.out
+#PBS -e snap_train.err
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+# Change to working directory
+cd "/nlustre/users/jsingh/ficus_benjamina/benjamina_annotation.maker.output/"
+echo "Starting SNAP training via MAKER"
+
+# =============================
+# SETTINGS
+# =============================
+GENOME="/nlustre/users/jsingh/ficus_benjamina/benjamina_assembly.fasta"
+MAKER_GFF="/nlustre/users/jsingh/ficus_benjamina/benjamina_annotation.maker.output/benjamina_annotation.all.maker.gff"
+PROJECT_SNAP=/nlustre/users/jsingh/ficus_benjamina/snap_training
+SPECIES=ficus_benjamina
+THREADS=28
+SNAP_BIN=/apps/maker-2.31.10/exe/snap/snap
+# Make project-specific folder
+mkdir -p ${PROJECT_SNAP}
+cd ${PROJECT_SNAP}
+
+# =============================
+# LOAD MODULES
+# =============================
+module load maker-2.31.10
+
+# =============================
+# 1) EXTRACT HIGH-CONFIDENCE GENES FROM MAKER
+# =============================
+echo "Extracting all MAKER predictions for SNAP"
+maker2zff -n ${MAKER_GFF}
+
+# Rename outputs for clarity
+mv genome.ann ${SPECIES}.ann
+mv genome.dna ${SPECIES}.dna
+fathom -validate ${SPECIES}.ann ${SPECIES}.dna
+fathom -gene-stats ${SPECIES}.ann ${SPECIES}.dna
+
+# =============================
+# VERIFY MAKER2ZFF OUTPUT
+# =============================
+echo "Checking that SNAP input files exist..."
+
+if [[ ! -s ${SPECIES}.ann ]]; then
+    echo "ERROR: ${SPECIES}.ann does not exist or is empty"
+    exit 1
+fi
+
+if [[ ! -s ${SPECIES}.dna ]]; then
+    echo "ERROR: ${SPECIES}.dna does not exist or is empty"
+    exit 1
+fi
+
+echo "Input files look good."
+
+# =============================
+# 3) TRAIN SNAP
+# =============================
+echo "Categorizing training annotations..."
+fathom -categorize 1000 ${SPECIES}.ann ${SPECIES}.dna
+
+echo "Exporting for forge..."
+fathom -export 1000 -plus ${SPECIES}.ann ${SPECIES}.dna 
+
+echo "Running forge..."
+forge export.ann export.dna
+
+echo "Building final HMM..."
+hmm-assembler.pl ${SPECIES} . > ${SPECIES}.hmm
+
+# =============================
+# 4) VALIDATE HMM ON TEST SET
+# =============================
+echo "Validating HMM on test set..."
+fathom ${SPECIES}.ann ${SPECIES}.dna -validate
+
+echo "SNAP training complete!"

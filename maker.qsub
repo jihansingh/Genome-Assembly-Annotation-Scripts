@@ -1,0 +1,20 @@
+#!/bin/bash
+#PBS -N maker2_benjamina
+#PBS -l nodes=1:ppn=28
+#PBS -l walltime=720:00:00
+#PBS -q long
+#PBS -o maker_stdout.benjamina
+#PBS -e maker_stderr.benjamina
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+# Change to the working directory
+cd $PBS_O_WORKDIR
+
+# Load MAKER module
+module load maker-2.31.10
+
+# Run MAKER 
+maker -base benjamina_round2_annotation
+

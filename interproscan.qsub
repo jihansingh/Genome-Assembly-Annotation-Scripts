@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -N interproscan_benjamina
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o interproscan.stdout
+#PBS -e interproscan.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load interproscan-5.64
+
+PROT_SAL=/nlustre/users/jsingh/ficus_benjamina/benjamina_filtered.proteins.fasta
+
+OUT_SAL=/nlustre/users/jsingh/ficus_benjamina/interproscan
+
+mkdir -p ${OUT_SAL} 
+
+echo "Running InterProScan: F. benjamina"
+interproscan.sh \
+    -i ${PROT_SAL} \
+    -d ${OUT_SAL} \
+    -f TSV,GFF3,XML \
+    -goterms \
+    -cpu ${PBS_NUM_PPN} \
+    --seqtype p \
+    -dp
+
