@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o stdout.quast 
+#PBS -e stderr.quast
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load quast-5.0.2
+
+quast.py /nlustre/users/jsingh/ficus_craterostoma/racon_shasta/racon_polish3.fasta \
+ -o /nlustre/users/jsingh/ficus_craterostoma/quast_shasta --eukaryote

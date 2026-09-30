@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=720:00:00
+#PBS -q bigmem
+#PBS -o stdout.racon_hifiasm
+#PBS -e stderr.racon_hifiasm
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load racon
+
+cd $PBS_O_WORKDIR
+
+racon -m 3 -x -5 -g -4 -w 500 -t 24 \
+/nlustre/users/jsingh/ficus_craterostoma/raw_reads/jihan-fig1.fq \
+/nlustre/users/jsingh/ficus_craterostoma/minimap2_hifiasm_out/ficus_craterostoma_hifiasm.sam \
+/nlustre/users/jsingh/ficus_craterostoma/hifiasm_out/hifiasm_assembly.fasta \
+> /nlustre/users/jsingh/ficus_craterostoma/racon_hifiasm/racon_polish1.fasta
+
+

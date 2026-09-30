@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -N interproscan_craterostoma
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o interproscan.stdout
+#PBS -e interproscan.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load interproscan-5.29
+
+mkdir interProOut
+for file in KnownProteomes/*.faa
+do
+        out=${file##KnownProteomes/}
+        interproscan.sh -goterms -o interProOut/${out%%.faa}.tsv -pa -cpu 24 \
+        -dp -f TSV -i $file
+done
+

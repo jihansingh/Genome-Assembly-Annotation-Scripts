@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=8:00:00
+#PBS -q normal
+#PBS -o stdout.nanofilt
+#PBS -e stderr.nanofilt
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load nanofilt
+
+NanoFilt --length 1000 < /nlustre/users/jsingh/ficus_craterostoma/chopper2_out/trim2.fq > /nlustre/users/jsingh/ficus_craterostoma/nanofilt_out/fc_trim.fq

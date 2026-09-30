@@ -1,0 +1,56 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=720:00:00
+#PBS -q bigmem
+#PBS -o stdout.3xracon_flye
+#PBS -e stderr.3xracon_flye
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load minimap2
+module load racon
+
+# Paths
+READS=/nlustre/users/jsingh/ficus_craterostoma/raw_reads/jihan-fig1.fq
+ASSEMBLY_DIR=/nlustre/users/jsingh/ficus_craterostoma/flye_assembly
+MAP_DIR=/nlustre/users/jsingh/ficus_craterostoma/minimap2_flye_out
+RACON_DIR=/nlustre/users/jsingh/ficus_craterostoma/racon_flye
+
+mkdir -p $MAP_DIR
+mkdir -p $RACON_DIR
+
+# Initial assembly
+ASM_IN=$ASSEMBLY_DIR/assembly.fasta
+
+# Number of polishing rounds
+ROUNDS=3
+
+for i in $(seq 1 $ROUNDS); do
+    echo "=============================="
+    echo "Starting Racon round $i"
+    echo "=============================="
+
+    SAM_OUT=$MAP_DIR/ficus_craterostoma_round${i}.sam
+    ASM_OUT=$RACON_DIR/racon_polish${i}.fasta
+
+    # Mapping
+    minimap2 -ax map-ont -t 24 \
+        $ASM_IN \
+        $READS \
+        > $SAM_OUT
+
+    # Polishing
+    racon -m 3 -x -5 -g -4 -w 500 -t 24 \
+        $READS \
+        $SAM_OUT \
+        $ASM_IN \
+        > $ASM_OUT
+
+    # Next round uses this output
+    ASM_IN=$ASM_OUT
+done
+
+echo "All Racon polishing rounds completed."

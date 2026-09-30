@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=720:00:00
+#PBS -q bigmem
+#PBS -o stdout.flye
+#PBS -e stderr.flye
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load flye
+
+flye --nano-corr /nlustre/users/jsingh/ficus_craterostoma/nanofilt_out/fc_trim.fq --genome-size 560m --out-dir flye_assembly --threads 24  

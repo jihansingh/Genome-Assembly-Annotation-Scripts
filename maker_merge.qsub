@@ -1,0 +1,22 @@
+#!/bin/bash
+#PBS -N maker_hifiasm
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o maker_stdout.maker_merge
+#PBS -e maker_stderr.maker_merge
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+# Change to the maker output directory
+cd /nlustre/users/jsingh/ficus_craterostoma/craterostoma_round2_annotation.maker.output/
+
+# Load MAKER module
+module load maker-2.31.10
+
+# Merge
+
+gff3_merge -s -d craterostoma_round2_annotation_master_datastore_index.log > craterostoma_round2_annotation.all.maker.gff
+
+fasta_merge -d craterostoma_round2_annotation_master_datastore_index.log

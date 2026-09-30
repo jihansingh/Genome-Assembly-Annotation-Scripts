@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=720:00:00
+#PBS -q bigmem
+#PBS -o stdout.necat
+#PBS -e stderr.necat
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+# Move to submission directory
+cd $PBS_O_WORKDIR
+
+# Load NECAT
+module load necat
+
+# Run NECAT pipeline
+necat.pl correct /nlustre/users/jsingh/ficus_craterostoma/necat/necat_config.txt
+necat.pl assemble /nlustre/users/jsingh/ficus_craterostoma/necat/necat_config.txt
+necat.pl bridge /nlustre/users/jsingh/ficus_craterostoma/necat/necat_config.txt
+

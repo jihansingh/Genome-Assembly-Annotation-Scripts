@@ -1,0 +1,22 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o stdout.busco_proteins
+#PBS -e stderr.busco_proteins
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load busco-5.7.1
+
+busco \
+ -i "/nlustre/users/jsingh/ficus_craterostoma/craterostoma_round2_annotation.maker.output/craterostoma_round2_annotation.all.maker.proteins.fasta" \
+ -l /nlustre/users/jsingh/ficus_craterostoma/busco_downloads/lineages/eudicots_odb10 \
+ -o busco_proteins \
+ -m protein \
+ -c 24 \
+ --offline
+
