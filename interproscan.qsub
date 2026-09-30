@@ -1,0 +1,22 @@
+#!/bin/bash
+#PBS -N interproscan_salicifolia
+#PBS -l nodes=1:ppn=28
+#PBS -l walltime=720:00:00
+#PBS -q long
+#PBS -o interproscan.stdout
+#PBS -e interproscan.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load interproscan-5.29
+
+mkdir interProOut
+for file in /nlustre/users/jsingh/ficus_salicifolia/orthofinder/proteomes/*.faa
+do
+        out=${file##/nlustre/users/jsingh/ficus_salicifolia/orthofinder/proteomes/}
+        interproscan.sh -goterms -o interProOut/${out%%.faa}.tsv -pa -cpu 24 \
+        -dp -f TSV -i $file
+done

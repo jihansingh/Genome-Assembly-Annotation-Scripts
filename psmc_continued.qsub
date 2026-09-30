@@ -1,0 +1,93 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=24:00:00
+#PBS -q normal
+#PBS -o stdout.psmc2
+#PBS -e stderr.psmc2
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+# ---------------------------
+# MODULES
+# ---------------------------
+module load psmc
+module load seqtk
+# ------------------------------------------------------------
+# Paths and parameters
+# ------------------------------------------------------------
+
+SAMPLE_ID="F_salicifolia"
+PSMC_DIR="/nlustre/users/jsingh/ficus_salicifolia/psmc_results"
+
+PSMCFA="${PSMC_DIR}/psmcfa_files/${SAMPLE_ID}.psmcfa"
+PSMC_OUT=
+"/nlustre/users/jsingh/ficus_salicifolia/psmc_results/psmc_out/F_salicifolia/F_salicifolia.psmc"
+BOOTSTRAP_DIR="${PSMC_DIR}/bootstraps"
+PLOT_PREFIX="${PSMC_DIR}/plots/${SAMPLE_ID}_psmc"
+
+PSMC_PARAMS="-N30 -t5 -r5 -p 4+25*2+4+6"
+GENERATION_TIME=7
+MUTATION_RATE=1.75e-8
+
+THREADS=24
+
+# ------------------------------------------------------------
+# Directory setup
+# ------------------------------------------------------------
+
+mkdir -p "${BOOTSTRAP_DIR}"
+mkdir -p "${PSMC_DIR}/plots"
+
+echo "[$(date)] Starting bootstrap + plot pipeline"
+echo "[$(date)] Using psmcfa: ${PSMCFA}"
+echo "[$(date)] Using main psmc output: ${PSMC_OUT}"
+
+# ------------------------------------------------------------
+# STEP 1: Split psmcfa for bootstrapping
+# ------------------------------------------------------------
+
+echo "[$(date)] Splitting psmcfa..."
+
+splitfa "${PSMCFA}" > "${BOOTSTRAP_DIR}/${SAMPLE_ID}_split.psmcfa"
+
+echo "[$(date)] Split psmcfa written to: ${BOOTSTRAP_DIR}/${SAMPLE_ID}_split.psmcfa"
+
+# ------------------------------------------------------------
+# STEP 2: Run 100 bootstrap replicates (parallelised)
+# ------------------------------------------------------------
+
+echo "[$(date)] Running 100 bootstrap replicates (${THREADS} threads)..."
+
+seq 1 100 | parallel -j "${THREADS}" \
+    "psmc ${PSMC_PARAMS} \
+        -b \
+        -o ${BOOTSTRAP_DIR}/bootstrap_{}.psmc \
+        ${BOOTSTRAP_DIR}/${SAMPLE_ID}_split.psmcfa"
+
+echo "[$(date)] Bootstrap runs complete"
+
+# ------------------------------------------------------------
+# STEP 3: Combine main run + bootstraps and plot
+# ------------------------------------------------------------
+
+echo "[$(date)] Combining main PSMC output with bootstraps..."
+
+cat "${PSMC_OUT}" \
+    "${BOOTSTRAP_DIR}"/bootstrap_*.psmc \
+    > "${PSMC_DIR}/${SAMPLE_ID}_combined.psmc"
+
+echo "[$(date)] Generating plot..."
+
+psmc_plot.pl \
+    -u "${MUTATION_RATE}" \
+    -g "${GENERATION_TIME}" \
+    -p \
+    "${PLOT_PREFIX}" \
+    "${PSMC_DIR}/${SAMPLE_ID}_combined.psmc"
+
+echo "[$(date)] Plot written to: ${PLOT_PREFIX}.pdf and ${PLOT_PREFIX}.eps"
+echo "[$(date)] Done."
+

@@ -1,0 +1,17 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o stdout.minimap2hifi
+#PBS -e stderr.minimap2hifi
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load minimap2
+
+mkdir -p minimap2_shasta_out
+
+minimap2 -ax map-ont -t 24 /nlustre/users/jsingh/ficus_craterostoma/shasta_out/Assembly.fasta /nlustre/users/jsingh/ficus_craterostoma/raw_reads/jihan-fig1.fq > minimap2_shasta_out/ficus_craterostoma_shasta.sam

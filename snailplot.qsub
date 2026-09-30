@@ -1,0 +1,33 @@
+#!/bin/bash
+#PBS -N btk_snail_craterostoma
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=24:00:00
+#PBS -q normal
+#PBS -o btk_snail.stdout
+#PBS -e btk_snail.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+# Load and activate blobtools environment
+module load blobtools
+source /apps/anaconda3-2024.10-1/etc/profile.d/conda.sh
+conda activate btk
+
+# Create output directory
+mkdir -p /nlustre/users/jsingh/ficus_salicifolia/blobtools2/
+
+# Create BTK dataset
+blobtools create \
+    --fasta /nlustre/users/jsingh/ficus_salicifolia/racon_hifiasm/racon_polish3.fasta \
+    --busco /nlustre/users/jsingh/ficus_salicifolia/busco_hifiasm/run_embryophyta_odb10/full_table.tsv \
+    /nlustre/users/jsingh/ficus_salicifolia/blobtools2/Fsalicifolia_btk2/
+
+# Generate snail plot
+blobtools view \
+    --view snail \
+    --format png \
+    --plot \
+    /nlustre/users/jsingh/ficus_salicifolia/blobtools2/Fsalicifolia_btk2/

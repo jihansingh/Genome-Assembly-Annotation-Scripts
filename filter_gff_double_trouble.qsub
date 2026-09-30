@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o filtergff.stdout
+#PBS -e filtergff.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+grep -v "^#" "/nlustre/users/jsingh/ficus_salicifolia/salicifolia_filtered_v2.gff3" \
+  | awk '$3 ~ /^(gene|mRNA|exon|CDS|five_prime_UTR|three_prime_UTR)$/' \
+  > "/nlustre/users/jsingh/ficus_salicifolia/salicifolia_genes_filtered.gff3"

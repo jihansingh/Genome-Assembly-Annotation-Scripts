@@ -1,0 +1,14 @@
+#!/bin/bash
+#PBS -N maker_filtering
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o maker_filter.stdout
+#PBS -e maker_filter.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+perl /nlustre/users/jsingh/ficus_salicifolia/quality_filter   -a 0.5   "/nlustre/users/jsingh/ficus_salicifolia/ficus_salicifolia_round2_annotation.maker.output/ficus_salicifolia_round2.all.maker.gff"   > /nlustre/users/jsingh/ficus_salicifolia/salicifolia_filtered_v2.gff3

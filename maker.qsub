@@ -1,0 +1,20 @@
+#!/bin/bash
+#PBS -N maker2_salicifolia
+#PBS -l nodes=1:ppn=28
+#PBS -l walltime=900:00:00
+#PBS -q long
+#PBS -o maker.stdout
+#PBS -e maker.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+# Change to the working directory
+cd $PBS_O_WORKDIR
+
+# Load MAKER module
+module load maker-2.31.10
+
+# Run MAKER 
+maker -base ficus_salicifolia_round2_annotation
+

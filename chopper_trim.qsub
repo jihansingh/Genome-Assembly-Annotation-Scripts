@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=8:00:00
+#PBS -q normal
+#PBS -o stdout.chopper_trim
+#PBS -e stderr.chopper_trim
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load chopper
+
+chopper -q 10 -i /nlustre/users/jsingh/ficus_craterostoma/chopper2_out/trim2.fq > fc_trim.fq
+

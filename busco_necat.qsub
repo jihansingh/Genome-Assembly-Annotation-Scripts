@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o stdout.busco_necat 
+#PBS -e stderr.busco_necat
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load busco-5.7.1
+
+busco \
+ -i /nlustre/users/jsingh/ficus_salicifolia/racon_necat/racon_polish3.fasta \
+ -l /nlustre/users/jsingh/ficus_salicifolia/busco_downloads/lineages/embryophyta_odb10 \
+ -o busco_necat \
+ -m genome \
+ -c 24 \
+ --offline

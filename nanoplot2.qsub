@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=8:00:00
+#PBS -q normal
+#PBS -o stdout.nanoqc 
+#PBS -e stderr.nanoqc
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load nanoplot
+NanoPlot \
+  --fastq "/nlustre/users/jsingh/ficus_salicifolia/chopper_adapter_trim/salicifolia_adapter_trim.fq" \
+  -o nanoplot1_out \
+  --plots hex dot \
+  --threads 24 \
+  --loglength \
+  --N50 \
+  --title "Ficus Salicifolia Read QC"
+
+

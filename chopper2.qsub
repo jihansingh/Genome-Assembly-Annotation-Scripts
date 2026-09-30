@@ -1,0 +1,17 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=8:00:00
+#PBS -q normal
+#PBS -o stdout.chopper2
+#PBS -e stderr.chopper2
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+mkdir chopper_q10
+
+module load chopper
+
+chopper -q 10 -i /nlustre/users/jsingh/ficus_salicifolia/chopper_adapter_trim/salicifolia_adapter_trim.fq > chopper_q10/salicifolia_q10_trim.fq

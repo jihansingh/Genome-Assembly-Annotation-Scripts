@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=30:00:00
+#PBS -q normal
+#PBS -o agat.stdout
+#PBS -e agat.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load agat
+
+agat_sp_statistics.pl \
+  --gff "/nlustre/users/jsingh/ficus_salicifolia/salicifolia_genes_filtered.gff3" \
+  --output /nlustre/users/jsingh/ficus_salicifolia/salicifolia_agat_stats.txt
+
+agat_sp_statistics.pl \
+  --gff "/nlustre/users/jsingh/ficus_craterostoma/craterostoma_genes_filtered.gff3" \
+  --output /nlustre/users/jsingh/ficus_craterostoma/craterostoma_agat_stats.txt
+
+agat_sp_statistics.pl \
+  --gff /nlustre/users/jsingh/ficus_benjamina/benjamina_genes_filtered.gff3 \
+  --output /nlustre/users/jsingh/ficus_benjamina/benjamina_agat_stats.txt

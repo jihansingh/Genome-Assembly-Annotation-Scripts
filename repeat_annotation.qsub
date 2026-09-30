@@ -1,0 +1,98 @@
+#!/bin/bash
+#PBS -N repeat_salicifolia
+#PBS -l nodes=1:ppn=28
+#PBS -l walltime=720:00:00
+#PBS -q long
+#PBS -o repeat.stdout
+#PBS -e repeat.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+############################################################
+# Change to working directory
+############################################################
+
+cd $PBS_O_WORKDIR
+
+set -e
+set -o pipefail
+
+############################################################
+# Load modules
+############################################################
+
+module load maker-2.31.10
+module load repeatmodeler
+
+############################################################
+# Variables
+############################################################
+
+GENOME="/nlustre/users/jsingh/ficus_salicifolia/racon_hifiasm/racon_polish3.fasta"
+PREFIX="ficus_salicifolia"
+
+THREADS=28
+
+############################################################
+# Create output directory
+############################################################
+
+mkdir -p RepeatAnnotation
+cd RepeatAnnotation
+
+############################################################
+# Build RepeatModeler database
+############################################################
+
+echo "======================================="
+echo "Building RepeatModeler database..."
+echo "======================================="
+
+BuildDatabase \
+    -name ${PREFIX} \
+    ${GENOME}
+
+############################################################
+# Run RepeatModeler
+############################################################
+
+echo "======================================="
+echo "Running RepeatModeler..."
+echo "======================================="
+
+RepeatModeler \
+    -database ${PREFIX} \
+    -pa ${THREADS}
+
+############################################################
+# Run RepeatMasker
+############################################################
+
+echo "======================================="
+echo "Running RepeatMasker..."
+echo "======================================="
+
+RepeatMasker \
+    -pa ${THREADS} \
+    -lib ${PREFIX}-families.fa \
+    -gff \
+    -xsmall \
+    ${GENOME}
+
+############################################################
+# Finished
+############################################################
+
+echo ""
+echo "======================================="
+echo "Repeat annotation completed!"
+echo "======================================="
+echo ""
+
+echo "Important output files:"
+echo "${PREFIX}-families.fa"
+echo "${GENOME}.tbl"
+echo "${GENOME}.out"
+echo "${GENOME}.gff"
+echo "${GENOME}.masked"

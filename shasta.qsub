@@ -1,0 +1,19 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=720:00:00
+#PBS -q bigmem
+#PBS -o stdout.shasta
+#PBS -e stderr.shasta
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load shasta-0.7.0
+
+shasta \
+  --input /nlustre/users/jsingh/ficus_salicifolia/nanofilt_out/salicifolia.fq \
+  --threads 24 \
+  --assemblyDirectory shasta_out\
+  --Reads.minReadLength=1000

@@ -1,0 +1,33 @@
+#!/bin/bash
+#PBS -N orthofinder
+#PBS -l nodes=1:ppn=28
+#PBS -l walltime=720:00:00
+#PBS -q long
+#PBS -o orthofinder.stdout
+#PBS -e orthofinder.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load orthofinder-2.5.5
+
+PROTDIR=/nlustre/users/jsingh/ficus_salicifolia/orthofinder/proteomes
+mkdir -p ${PROTDIR}
+
+cp /nlustre/users/jsingh/ficus_salicifolia/salicifolia_filtered_v2.proteins.fasta ${PROTDIR}/ficus_salicifolia.faa
+cp /nlustre/users/jsingh/ficus_craterostoma/craterostoma_filtered_v2.proteins.fasta ${PROTDIR}/ficus_craterostoma.faa
+cp /nlustre/users/jsingh/ficus_benjamina/benjamina_filtered_v2.proteins.fasta ${PROTDIR}/ficus_benjamina.faa
+
+orthofinder \
+    -f ${PROTDIR} \
+    -o /nlustre/users/jsingh/ficus_salicifolia/orthofinder/results \
+    -t ${PBS_NUM_PPN} \
+    -a ${PBS_NUM_PPN} \
+    -S blast \
+    -M msa \
+    -T fasttree \
+    -n ficus_3sp
+
+echo "OrthoFinder finished with exit code $?"

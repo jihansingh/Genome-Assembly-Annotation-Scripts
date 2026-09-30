@@ -1,0 +1,71 @@
+#!/bin/bash
+#PBS -N wgd
+#PBS -l nodes=1:ppn=28
+#PBS -l walltime=720:00:00
+#PBS -q normal
+#PBS -o filtered_transcripts.stdout
+#PBS -e filtered_transcripts.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load gffread
+module load wgd
+
+# =========================
+# INPUT FILES (YOUR DATA)
+# =========================
+
+GFF="/nlustre/users/jsingh/ficus_salicifolia/salicifolia_filtered_v2.gff3"
+PROT="/nlustre/users/jsingh/ficus_salicifolia/salicifolia_filtered_v2.proteins.fasta"
+
+OUTDIR="/nlustre/users/jsingh/ficus_salicifolia/wgd_ks_analysis"
+PREFIX="ficus_salicifolia"
+
+mkdir -p $OUTDIR
+cd $OUTDIR
+
+gffread /nlustre/users/jsingh/ficus_salicifolia/salicifolia_filtered_v2.gff3 \
+    -g /nlustre/users/jsingh/ficus_salicifolia/hifiasm_out/hifiasm_assembly.fasta \
+    -x ${PREFIX}.cds.fa \# =========================
+    -y ${PREFIX}.protein.fa \
+    -F
+# STEP 1: CLEAN PROTEINS
+# =========================
+
+echo "Preparing protein dataset..."
+
+cp $PROT ${PREFIX}.protein.fa
+
+# remove stop codons if present
+sed -i 's/\*//g' ${PREFIX}.protein.fa
+
+# =========================
+# STEP 2: RUN WGD PIPELINE
+# =========================
+
+echo "Running wgd dmd..."
+
+wgd dmd ${PREFIX}.protein.fa
+
+echo "Running wgd mcl..."
+
+wgd mcl ${PREFIX}.protein.fa ${PREFIX}.protein.fa
+
+echo "Running wgd ks..."
+
+# NOTE: wgd can run without CDS if it infers internally,
+# but CDS-based Ks is better. We'll add CDS step below if needed.
+
+wgd ks ${PREFIX}.protein.fa
+
+# =========================
+# STEP 3: OUTPUT CLEANUP
+# =========================
+
+mkdir -p results
+mv *.tsv *.txt *.pdf results/ 2>/dev/null
+
+echo "DONE"

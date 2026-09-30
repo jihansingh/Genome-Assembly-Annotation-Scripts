@@ -1,0 +1,19 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=720:00:00
+#PBS -q long
+#PBS -o stdout.rsync
+#PBS -e stderr.rsync
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+# Source and destination
+SRC="/nlustre/users/nicky/UPGL/jihan2/ficus_salicifolia.fq"
+DEST="/nlustre/users/jsingh/ficus_salicifolia/"
+
+# Rsync file
+rsync -avh --progress "$SRC" "$DEST"
+

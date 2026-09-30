@@ -1,0 +1,66 @@
+#!/bin/bash
+#PBS -N wgd
+#PBS -l nodes=1:ppn=24
+#PBS -l walltime=720:00:00
+#PBS -q bigmem
+#PBS -o wgd.stdout
+#PBS -e wgd.stderr
+#PBS -k oe
+#PBS -m ae
+#PBS -M u21465186@tuks.co.za
+
+cd $PBS_O_WORKDIR
+
+module load gffread
+module load wgd_v2
+module load diamond-2.0.11
+module load mcl-14-137
+module load paml4.9j
+module load fasttree
+# =========================
+# INPUT FILES (YOUR DATA)
+# =========================
+
+cd $PBS_O_WORKDIR module load gffread module load wgd_v2 module load diamond-2.0.11
+# ========================= INPUT FILES =========================
+GFF="/nlustre/users/jsingh/ficus_salicifolia/salicifolia_filtered_v2.gff3" 
+GENOME="/nlustre/users/jsingh/ficus_salicifolia/racon_hifiasm/racon_polish3.fasta" 
+OUTDIR="/nlustre/users/jsingh/ficus_salicifolia/wgd_ks_analysis"
+
+PREFIX="ficus_salicifolia"
+
+mkdir -p "$OUTDIR" 
+
+cd "$OUTDIR"
+# ========================= STEP 1: EXTRACT CDS =========================
+if [ ! -f ${PREFIX}.cds.fa ]; then
+ echo "Extracting CDS with gffread..."
+ gffread "$GFF" \
+    -g "$GENOME" \
+    -x ${PREFIX}.cds.fa \
+    -E 
+fi
+echo "CDS sequences: $(grep -c '^>' ${PREFIX}.cds.fa)"
+# ========================= STEP 2: WGD DMD (all-vs-all diamond + MCL) =========================
+if [ ! -f wgd_dmd/${PREFIX}.cds.fa.tsv ]; then
+echo "Running wgd dmd..." 
+wgd dmd ${PREFIX}.cds.fa \
+    -o wgd_dmd \
+    -n 24 
+fi
+echo "DMD done.
+Families file:" ls -lh wgd_dmd/
+# ========================= STEP 3: WGD KSD (Ks distribution) =========================
+FAMILIES=$(ls wgd_dmd/*.tsv 2>/dev/null | head -1)
+if [ -z "$FAMILIES" ]; then
+    echo "ERROR: No .tsv families file found in wgd_dmd/. DMD may have failed."
+    exit 1 
+fi 
+echo "Running wgd ksd with families: $FAMILIES"
+wgd ksd "$FAMILIES" ${PREFIX}.cds.fa \
+    -o wgd_ksd \
+    -n 24 
+# ========================= STEP 4: COLLECT RESULTS =========================
+mkdir -p results
+cp wgd_ksd/*.tsv wgd_ksd/*.pdf results/ 2>/dev/null
+echo "DONE"
